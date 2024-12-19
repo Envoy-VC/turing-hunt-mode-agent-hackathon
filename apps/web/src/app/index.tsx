@@ -1,71 +1,50 @@
-import { useAuth, useWallet } from '@crossmint/client-sdk-react-ui';
+import { useEffect, useRef } from 'react';
+
 import { createFileRoute } from '@tanstack/react-router';
+import Phaser from 'phaser';
 
-const HomeComponent = () => {
-  return (
-    <div className='p-2'>
-      <h3>Welcome Home!</h3>
-      <AuthButton />
-      <Wallet />
-    </div>
-  );
-};
+import { WorldScene } from '../game/scenes';
 
-const AuthButton = () => {
-  const { login, logout, jwt } = useAuth();
+export const GameComponent = () => {
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const phaserGameRef = useRef<Phaser.Game | null>(null);
 
-  return (
-    <div>
-      {!jwt ? (
-        <button
-          className='rounded bg-blue-500 px-4 py-2 font-bold text-white'
-          type='button'
-          onClick={login}
-        >
-          Login
-        </button>
-      ) : (
-        <button
-          className='rounded border-2 border-blue-500 bg-black px-4 py-2 font-bold text-white'
-          type='button'
-          onClick={logout}
-        >
-          Logout
-        </button>
-      )}
-    </div>
-  );
-};
+  useEffect(() => {
+    if (gameContainerRef.current) {
+      const config: Phaser.Types.Core.GameConfig = {
+        width: 40 * 16,
+        height: 20 * 16,
+        type: Phaser.AUTO,
+        scene: [WorldScene],
+        scale: {
+          width: '100%',
+          height: '100%',
+        },
+        parent: 'game-container',
+        pixelArt: true,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 0, x: 1 },
+          },
+        },
+      };
 
-const Wallet = () => {
-  const { wallet, status, error } = useWallet();
+      const phaserGame = new Phaser.Game(config);
+      phaserGameRef.current = phaserGame;
+    }
 
-  return (
-    <div>
-      {status === 'loading-error' && error ? (
-        <div className='rounded-lg border-2 border-red-500 px-8 py-4 font-bold text-red-500'>
-          Error: {error.message}
-        </div>
-      ) : null}
-      {status === 'in-progress' && (
-        <div className='rounded-lg border-2 border-yellow-500 px-8 py-4 font-bold text-yellow-500'>
-          Loading...
-        </div>
-      )}
-      {status === 'loaded' && wallet ? (
-        <div className='rounded-lg border-2 border-green-500 px-8 py-4 font-bold text-green-500'>
-          Wallet: {wallet.address}
-        </div>
-      ) : null}
-      {status === 'not-loaded' && (
-        <div className='rounded-lg border-2 border-gray-500 px-8 py-4 font-bold text-gray-500'>
-          Wallet not loaded
-        </div>
-      )}
-    </div>
-  );
+    return () => {
+      if (phaserGameRef.current) {
+        phaserGameRef.current.destroy(true);
+        phaserGameRef.current = null;
+      }
+    };
+  }, []);
+
+  return <div ref={gameContainerRef} id='game-container' />;
 };
 
 export const Route = createFileRoute('/')({
-  component: HomeComponent,
+  component: GameComponent,
 });
