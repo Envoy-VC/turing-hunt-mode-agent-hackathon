@@ -28,6 +28,7 @@ contract TuringHunt is Ownable {
         uint8 totalPlayers;
         uint256 startTime;
         bool isEnded;
+        uint8 playerWithMostVotes;
     }
 
     struct Vote {
@@ -88,7 +89,13 @@ contract TuringHunt is Ownable {
             revert TooManyPlayers();
         }
 
-        games[_id] = Game({id: _id, totalPlayers: totalPlayers, startTime: block.timestamp, isEnded: false});
+        games[_id] = Game({
+            id: _id,
+            totalPlayers: totalPlayers,
+            startTime: block.timestamp,
+            isEnded: false,
+            playerWithMostVotes: 0
+        });
 
         for (uint8 i = 0; i < totalPlayers; i++) {
             players[_id][i] = _players[i];
@@ -226,6 +233,7 @@ contract TuringHunt is Ownable {
 
         address winner = gameWithPlayers.players[winnerIndex].player;
         games[_gameId].isEnded = true;
+        games[_gameId].playerWithMostVotes = winnerIndex;
         emit GameEnded(_gameId, winner);
     }
 }
