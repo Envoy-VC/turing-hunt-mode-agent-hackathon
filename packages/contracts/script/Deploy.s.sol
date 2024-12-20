@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "src/Counter.sol";
+import {TuringHunt} from "src/TuringHunt.sol";
 
 contract DeployScript is Script {
     function setUp() public {}
@@ -12,11 +12,11 @@ contract DeployScript is Script {
         address deployerAddress = vm.addr(deployerPrivateKey);
         vm.startBroadcast(deployerPrivateKey);
 
-        console.log("Deploying Counter with deployer address", deployerAddress);
+        console.log("Deploying TuringHunt with deployer address", deployerAddress);
 
-        Counter counter = new Counter(deployerAddress);
+        TuringHunt game = new TuringHunt(deployerAddress);
 
-        console.log("Deployed Counter at address: %s", address(counter));
+        console.log("Deployed TuringHunt at address: %s", address(game));
         vm.stopBroadcast();
     }
 }
