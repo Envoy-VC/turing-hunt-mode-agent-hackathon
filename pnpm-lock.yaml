@@ -110,6 +110,9 @@ importers:
       vite-plugin-node-polyfills:
         specifier: ^0.22.0
         version: 0.22.0(rollup@4.27.4)(vite@5.4.11(@types/node@22.9.3)(lightningcss@1.28.2))
+      yuka:
+        specifier: ^0.7.8
+        version: 0.7.8
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -153,6 +156,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.1
+      '@types/yuka':
+        specifier: ^0.7.4
+        version: 0.7.4
       '@typescript-eslint/parser':
         specifier: ^8.11.0
         version: 8.15.0(eslint@9.15.0(jiti@2.4.0))(typescript@5.6.3)
@@ -2346,6 +2352,9 @@ packages:
 
   '@types/ws@8.5.13':
     resolution: {integrity: sha512-osM/gWBTPKgHV8XkTunnegTRIsvF6owmf5w+JtAfOw472dptdm0dlGv4xCt6GwQRcC2XVOvvRE/0bAoQcL2QkA==}
+
+  '@types/yuka@0.7.4':
+    resolution: {integrity: sha512-nyfp47Re8wtzG0DdBPQ6PepXOU0CiMpPVWZ21y1mRImbnz53ADdHUbDY2GRNbIdsl7qlV3XWS+gVpj3zoIIPXA==}
 
   '@typescript-eslint/eslint-plugin@8.15.0':
     resolution: {integrity: sha512-+zkm9AR1Ds9uLWN3fkoeXgFppaQ+uEVtfOV62dDmsy9QCNqlRHWNEck4yarvRNrvRcHQLGfqBNui3cimoz8XAg==}
@@ -6256,6 +6265,9 @@ packages:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
 
+  yuka@0.7.8:
+    resolution: {integrity: sha512-G/pFcMZh2Azz7Yy500NSV1jQ0Ru7h9hTNyEW+HjRXcdzjJIyp/3mCGspnx7VJVP06zxORqK6mkl5TywLqVUnVg==}
+
   yup@0.32.11:
     resolution: {integrity: sha512-Z2Fe1bn+eLstG8DRR6FTavGD+MeAwyfmouhHsIUgaADz8jvFKbO/fXc2trJKZg+5EBjh4gGm3iU/t3onKlXHIg==}
     engines: {node: '>=10'}
@@ -8667,6 +8679,8 @@ snapshots:
   '@types/ws@8.5.13':
     dependencies:
       '@types/node': 22.9.3
+
+  '@types/yuka@0.7.4': {}
 
   '@typescript-eslint/eslint-plugin@8.15.0(@typescript-eslint/parser@8.15.0(eslint@9.15.0(jiti@2.4.0))(typescript@5.6.3))(eslint@9.15.0(jiti@2.4.0))(typescript@5.6.3)':
     dependencies:
@@ -13268,6 +13282,8 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.1.1: {}
+
+  yuka@0.7.8: {}
 
   yup@0.32.11:
     dependencies:

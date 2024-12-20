@@ -4,8 +4,10 @@
 import Phaser from 'phaser';
 import Map from 'public/assets/turing-hunt.json';
 
+import { Player } from '../entities';
+
 export class WorldScene extends Phaser.Scene {
-  public player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  public player!: Player;
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   public collisionLayer!: Phaser.Tilemaps.TilemapLayer;
 
@@ -20,9 +22,8 @@ export class WorldScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('world', 'assets/turing-hunt.json');
 
-    const frameWidth = 384 / 8;
-    const frameHeight = 1152 / 24;
-
+    const frameWidth = 64;
+    const frameHeight = 64;
     this.load.spritesheet('player', 'assets/sprites/player.png', {
       frameWidth,
       frameHeight,
@@ -30,7 +31,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setZoom(2.5);
+    this.cameras.main.setZoom(2);
     const zoom = this.cameras.main.zoom;
     this.cameras.main.roundPixels = true;
     this.cameras.main.setBounds(0, 0, 40 * 16 * zoom, 20 * 16 * zoom);
@@ -56,57 +57,17 @@ export class WorldScene extends Phaser.Scene {
       map.createLayer(layer.name, tilesets, 0, 0)!.setScale(zoom);
     });
 
-    this.anims.create({
-      key: 'idle-front',
-      frames: this.anims.generateFrameNumbers('player', {
-        start: 0,
-        end: 7,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.player = this.physics.add
-      .sprite(50, 250, 'player')
-      .setScale(2.5)
-      .setBodySize(12, 16)
-      .setOffset(16, 16);
+    this.player = new Player({ x: 50, y: 200, key: 'player' }, this);
 
     this.physics.world.setBounds(0, 0, 40 * 16 * zoom, 20 * 16 * zoom);
     this.collisionLayer.setCollisionByProperty({ collides: true });
-    this.physics.add.collider(this.player, this.collisionLayer);
-    this.player.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.sprite, this.collisionLayer);
 
-    // repeat infinite
-    this.player.anims.play({ key: 'idle-front', repeat: -1 }, true);
     this.cursors = this.input.keyboard!.createCursorKeys();
-
-    this.cameras.main.startFollow(this.player);
+    this.cameras.main.startFollow(this.player.sprite);
   }
 
   update() {
-    // Movement speed
-    const speed = 100;
-
-    this.player.body.setVelocity(0);
-
-    // Horizontal movement
-    if (this.cursors.right.isDown) {
-      this.player.body.setVelocityX(speed);
-    } else if (this.cursors.left.isDown) {
-      this.player.body.setVelocityX(-speed);
-    }
-
-    // Vertical movement
-    else if (this.cursors.up.isDown) {
-      this.player.body.setVelocityY(-speed);
-    } else if (this.cursors.down.isDown) {
-      this.player.body.setVelocityY(speed);
-    }
-
-    // Stop animations if no input
-    else {
-      // this.player.anims.stop();
-    }
+    this.player.update(this);
   }
 }
