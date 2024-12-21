@@ -10,4 +10,3 @@ export const voteParametersSchema = z.object({
     .string()
     .describe('The address of the player to vote for (hex string)'),
 });
-    
