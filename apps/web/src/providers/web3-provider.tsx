@@ -9,9 +9,10 @@ export const Web3Provider = ({ children }: PropsWithChildren) => {
   return (
     <CrossmintProvider apiKey={import.meta.env.VITE_CROSSMINT_API_KEY}>
       <CrossmintAuthProvider
+        loginMethods={['google']}
         embeddedWallets={{
           type: 'evm-smart-wallet',
-          defaultChain: 'polygon-amoy',
+          defaultChain: 'base-sepolia',
           createOnLogin: 'all-users',
         }}
       >

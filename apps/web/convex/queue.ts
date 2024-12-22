@@ -9,6 +9,11 @@ export const joinQueue = mutation({
   }),
   handler: async (ctx, args) => {
     const user = await getOrCreateUser(ctx, { address: args.address });
+    const queueEntry = await ctx.db
+      .query('queue')
+      .filter((q) => q.eq(q.field('player'), user))
+      .first();
+    if (queueEntry) return;
     await ctx.db.insert('queue', {
       player: user,
     });

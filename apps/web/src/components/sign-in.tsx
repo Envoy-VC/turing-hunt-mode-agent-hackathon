@@ -11,7 +11,11 @@ export const SignIn = () => {
     <Button
       className='flex h-12 flex-row items-center gap-2 rounded-xl font-medium text-white [&_svg]:size-6'
       onClick={() => {
-        login();
+        try {
+          login();
+        } catch (error) {
+          console.error(error);
+        }
       }}
     >
       <GoogleIcon size={100} />
