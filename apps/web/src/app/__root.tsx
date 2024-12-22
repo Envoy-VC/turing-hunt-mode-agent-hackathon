@@ -4,12 +4,14 @@ import { ProviderTree } from '~/providers';
 
 const RootComponent = () => {
   return (
-    <ProviderTree>
-      <Outlet />
-      {import.meta.env.MODE === 'development' && (
-        <TanStackRouterDevtools position='bottom-right' />
-      )}
-    </ProviderTree>
+    <div className='h-screen w-full'>
+      <ProviderTree>
+        <Outlet />
+        {import.meta.env.MODE === 'development' && (
+          <TanStackRouterDevtools position='bottom-right' />
+        )}
+      </ProviderTree>
+    </div>
   );
 };
 

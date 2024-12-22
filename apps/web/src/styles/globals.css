@@ -11,7 +11,19 @@
   }
 }
 
+@font-face {
+  font-family: 'Storm';
+  src: url('/fonts/storm.ttf') format('truetype');
+}
+
+*,
+body,
+html {
+  --tw-transform: translateX(0%);
+}
+
 @theme {
+  --font-storm: 'Storm', sans-serif;
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(0 0% 3.9%);
   --color-card: hsl(0 0% 100%);

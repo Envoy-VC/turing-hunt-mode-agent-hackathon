@@ -1,66 +1,57 @@
-import { useEffect, useRef } from 'react';
+import { useRef, useState } from 'react';
 
-import { createFileRoute } from '@tanstack/react-router';
-import Phaser from 'phaser';
-import { useGameActions } from '~/hooks/use-game-actions';
+import { createFileRoute, getRouteApi } from '@tanstack/react-router';
+import { useOnClickOutside } from 'usehooks-ts';
+import { z } from 'zod';
+import { HomeMenu } from '~/components';
 
-import { TaskDialog } from '~/components/tasks';
+const routeApi = getRouteApi('/');
 
-import { WorldScene } from '../game/scenes';
+export const HomeComponent = () => {
+  const { start } = routeApi.useSearch();
 
-export const GameComponent = () => {
-  const gameContainerRef = useRef<HTMLDivElement>(null);
-  const phaserGameRef = useRef<Phaser.Game | null>(null);
+  const [gameStarted, setGameStarted] = useState(start ?? false);
 
-  const actions = useGameActions();
+  const ref = useRef(null);
 
-  useEffect(() => {
-    if (gameContainerRef.current) {
-      const config: Phaser.Types.Core.GameConfig = {
-        width: 40 * 16,
-        height: 20 * 16,
-        type: Phaser.AUTO,
-        scene: [new WorldScene(actions)],
-        scale: {
-          width: '100%',
-          height: '100%',
-        },
-        parent: 'game-container',
-        pixelArt: true,
-        physics: {
-          default: 'arcade',
-          arcade: {
-            debug: true,
-            gravity: { y: 0, x: 1 },
-          },
-        },
-      };
-
-      const phaserGame = new Phaser.Game(config);
-      phaserGameRef.current = phaserGame;
+  const handleClickOutside = () => {
+    if (!gameStarted) {
+      setGameStarted(true);
     }
+  };
 
-    return () => {
-      if (phaserGameRef.current) {
-        phaserGameRef.current.destroy(true);
-        phaserGameRef.current = null;
-      }
-    };
-  }, []);
+  useOnClickOutside(ref, handleClickOutside);
 
   return (
-    <div className='h-screen w-screen border border-white'>
-      <TaskDialog
-        interactionType={actions.store.taskType}
-        open={actions.store.isTaskDialogOpen}
-        onOpenChange={actions.store.setIsTaskDialogOpen}
+    <div className='!m-0 !p-0'>
+      <img
+        alt='background'
+        className='absolute h-screen w-full object-cover'
+        src='/background.png'
       />
-
-      <div ref={gameContainerRef} id='game-container' />
+      <div className='absolute top-[18%] right-1/2 z-[1] translate-x-1/2'>
+        <div className='text-center font-storm text-[8rem] leading-[1] text-white'>
+          Turing
+          <br />
+          Hunt
+        </div>
+      </div>
+      <div className='absolute right-1/2 bottom-[30%] z-[1] translate-x-1/2'>
+        {!gameStarted ? (
+          <div ref={ref} className='animate-pulse text-neutral-200'>
+            Click anywhere on the screen to start the game
+          </div>
+        ) : (
+          <HomeMenu />
+        )}
+      </div>
     </div>
   );
 };
 
 export const Route = createFileRoute('/')({
-  component: GameComponent,
+  component: HomeComponent,
+  validateSearch: z.object({
+    start: z.boolean().optional(),
+  }),
 });
