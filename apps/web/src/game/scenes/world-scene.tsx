@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- safe */
 import Phaser from 'phaser';
 import Map from 'public/assets/turing-hunt.json';
+import type { GameActions } from '~/hooks';
 
 import { InteractionText, Player } from '../entities';
 
@@ -12,9 +13,11 @@ export class WorldScene extends Phaser.Scene {
   public collisionLayer!: Phaser.Tilemaps.TilemapLayer;
   public interactionLayer!: Phaser.Tilemaps.TilemapLayer;
   public interactionText!: InteractionText;
+  public actions: GameActions;
 
-  constructor() {
+  constructor(actions: GameActions) {
     super({ key: 'WorldScene' });
+    this.actions = actions;
   }
 
   preload() {

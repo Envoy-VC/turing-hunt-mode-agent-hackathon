@@ -65,6 +65,7 @@ export class InteractionText {
     if (Phaser.Input.Keyboard.JustDown(this.interactionKey)) {
       // TODO: Implement interaction logic
       console.log(`Interacted with Task ${interactionType}`, tile);
+      scene.actions.startTask(interactionType);
     }
   }
 
