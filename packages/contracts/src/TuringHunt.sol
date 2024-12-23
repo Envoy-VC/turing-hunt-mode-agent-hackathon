@@ -15,16 +15,16 @@ contract TuringHunt is Ownable {
     /// ========================================================
     error NotEnoughPlayers();
     error TooManyPlayers();
-    error PlayerNotFound(bytes32 gameId, address player);
-    error GameNotFound(bytes32 gameId);
-    error NotEveryoneVoted(bytes32 gameId);
-    error PlayerAlreadyVoted(bytes32 gameId, address player);
+    error PlayerNotFound(string gameId, address player);
+    error GameNotFound(string gameId);
+    error NotEveryoneVoted(string gameId);
+    error PlayerAlreadyVoted(string gameId, address player);
 
     /// ========================================================
     ///                        Structs
     /// ========================================================
     struct Game {
-        bytes32 id;
+        string id;
         uint8 totalPlayers;
         uint256 startTime;
         bool isEnded;
@@ -51,21 +51,21 @@ contract TuringHunt is Ownable {
     /// ========================================================
 
     /// @dev Mapping of game id to game struct
-    mapping(bytes32 => Game) public games;
+    mapping(string => Game) public games;
 
     /// @dev Mapping of GameId => PlayerIndex => PlayerAddress
-    mapping(bytes32 => mapping(uint8 => address)) public players;
+    mapping(string => mapping(uint8 => address)) public players;
 
     /// @dev Mapping of GameId => PlayerIndex => Vote
-    mapping(bytes32 => mapping(uint8 => Vote)) public votes;
+    mapping(string => mapping(uint8 => Vote)) public votes;
 
     /// ========================================================
     ///                        Events
     /// ========================================================
 
-    event GameCreated(bytes32 indexed gameId, address[] players);
-    event PlayerVoted(bytes32 indexed gameId, address indexed player, address indexed votee);
-    event GameEnded(bytes32 indexed gameId, address indexed winner);
+    event GameCreated(string indexed gameId, address[] players);
+    event PlayerVoted(string indexed gameId, address indexed player, address indexed votee);
+    event GameEnded(string indexed gameId, address indexed winner);
 
     /// ========================================================
     ///                        Constructor
@@ -80,7 +80,7 @@ contract TuringHunt is Ownable {
     /// @param _id The id of the game
     /// @param _players The addresses of the players
     /// @dev Reverts if the number of players is less than MIN_PLAYERS or greater than MAX_PLAYERS
-    function createGame(bytes32 _id, address[] memory _players) public payable {
+    function createGame(string memory _id, address[] memory _players) public payable {
         uint8 totalPlayers = uint8(_players.length);
         if (totalPlayers < MIN_PLAYERS) {
             revert NotEnoughPlayers();
@@ -108,7 +108,7 @@ contract TuringHunt is Ownable {
     /// @param _gameId The id of the game
     /// @param _votee The address of the player to vote for
     /// @dev Reverts if the game does not exist, the player has already voted, or not all players have voted
-    function vote(bytes32 _gameId, address _votee) public {
+    function vote(string memory _gameId, address _votee) public {
         ensureGameExists(_gameId);
         ensurePlayerHasNotVoted(_gameId, msg.sender);
 
@@ -129,7 +129,7 @@ contract TuringHunt is Ownable {
     /// @notice Get the game with players
     /// @param _gameId The id of the game
     /// @return The game with players
-    function getGame(bytes32 _gameId) public view returns (GameWithPlayers memory) {
+    function getGame(string memory _gameId) public view returns (GameWithPlayers memory) {
         Game memory game = games[_gameId];
         Player[] memory playersWithVotes = new Player[](game.totalPlayers);
 
@@ -149,7 +149,7 @@ contract TuringHunt is Ownable {
     /// @param _player The address of the player
     /// @return The index of the player
     /// @dev Reverts if the player is not found
-    function getPlayerIndex(bytes32 _gameId, address _player) internal view returns (uint8) {
+    function getPlayerIndex(string memory _gameId, address _player) internal view returns (uint8) {
         for (uint8 i = 0; i < games[_gameId].totalPlayers; i++) {
             if (players[_gameId][i] == _player) {
                 return i;
@@ -163,7 +163,7 @@ contract TuringHunt is Ownable {
     /// @param _gameId The id of the game
     /// @return boolean indicating if all players have voted
     /// @dev Returns false if not all players have voted
-    function hasEveryoneVoted(bytes32 _gameId) public view returns (bool) {
+    function hasEveryoneVoted(string memory _gameId) public view returns (bool) {
         for (uint8 i = 0; i < games[_gameId].totalPlayers; i++) {
             if (!votes[_gameId][i].hasVoted) {
                 return false;
@@ -175,7 +175,7 @@ contract TuringHunt is Ownable {
     /// @notice Ensure that all players have voted
     /// @param _gameId The id of the game
     /// @dev Reverts if not all players have voted
-    function ensureEveryoneVoted(bytes32 _gameId) internal view {
+    function ensureEveryoneVoted(string memory _gameId) internal view {
         bool everyoneVoted = hasEveryoneVoted(_gameId);
         if (!everyoneVoted) {
             revert NotEveryoneVoted(_gameId);
@@ -185,7 +185,7 @@ contract TuringHunt is Ownable {
     /// @notice Ensure that a game exists
     /// @param _gameId The id of the game
     /// @dev Reverts if the game does not exist
-    function ensureGameExists(bytes32 _gameId) internal view {
+    function ensureGameExists(string memory _gameId) internal view {
         if (games[_gameId].totalPlayers == 0) {
             revert GameNotFound(_gameId);
         }
@@ -195,7 +195,7 @@ contract TuringHunt is Ownable {
     /// @param _gameId The id of the game
     /// @param _player The address of the player
     /// @dev Reverts if the player has already voted
-    function ensurePlayerHasNotVoted(bytes32 _gameId, address _player) internal view {
+    function ensurePlayerHasNotVoted(string memory _gameId, address _player) internal view {
         uint8 playerIndex = getPlayerIndex(_gameId, _player);
         if (votes[_gameId][playerIndex].hasVoted) {
             revert PlayerAlreadyVoted(_gameId, _player);
@@ -206,7 +206,7 @@ contract TuringHunt is Ownable {
     /// @param _gameId The id of the game
     /// @dev Emits a GameEnded event with the winner
     /// @dev Reverts if the game does not exist, not all players have voted, or the game has already ended
-    function endGame(bytes32 _gameId) internal {
+    function endGame(string memory _gameId) internal {
         if (!hasEveryoneVoted(_gameId)) {
             return;
         }

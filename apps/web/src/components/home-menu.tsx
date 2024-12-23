@@ -2,17 +2,17 @@ import { useState } from 'react';
 
 import { cn } from '~/lib/utils';
 
-import { useAuth, useWallet } from '@crossmint/client-sdk-react-ui';
 import { useNavigate } from '@tanstack/react-router';
 import { useMutation } from 'convex/react';
+import { useAccount, useDisconnect } from 'wagmi';
 
 import { api } from '../../convex/_generated/api';
 import { QueueDialog } from './queue-dialog';
 import { SignIn } from './sign-in';
 
 export const HomeMenu = () => {
-  const { logout, status } = useAuth();
-  const { wallet } = useWallet();
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
   const navigate = useNavigate();
 
   const [isInQueue, setIsInQueue] = useState(false);
@@ -21,12 +21,12 @@ export const HomeMenu = () => {
   const leaveQueue = useMutation(api.queue.leaveQueue);
 
   const onOpenChange = async (open: boolean) => {
-    if (!wallet) return;
+    if (!address) return;
     if (open) {
-      await joinQueue({ address: wallet.address });
+      // await joinQueue({ address });
       setIsInQueue(true);
     } else {
-      await leaveQueue({ address: wallet.address });
+      // await leaveQueue({ address });
       setIsInQueue(false);
     }
   };
@@ -36,12 +36,7 @@ export const HomeMenu = () => {
       name: 'Play',
       key: 'play',
       onClick: async () => {
-        if (!wallet) {
-          return;
-        }
-        console.log(wallet.client.wallet.chain);
-
-        // await onOpenChange(true);
+        await onOpenChange(true);
       },
     },
     {
@@ -60,13 +55,13 @@ export const HomeMenu = () => {
     {
       name: 'Sign Out',
       key: 'sign-out',
-      onClick: () => logout(),
+      onClick: () => disconnect(),
     },
   ];
 
   const [hovered, setHovered] = useState<string | null>(null);
 
-  if (status !== 'logged-in') return <SignIn />;
+  if (!address) return <SignIn />;
 
   return (
     <>
