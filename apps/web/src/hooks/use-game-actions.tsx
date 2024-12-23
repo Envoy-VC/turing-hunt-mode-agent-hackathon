@@ -10,8 +10,8 @@ interface GameStore {
 }
 
 const useGameStore = create<GameStore>((set) => ({
-  isTaskDialogOpen: true,
-  taskType: 'television-set',
+  isTaskDialogOpen: false,
+  taskType: null,
   setIsTaskDialogOpen: (isTaskDialogOpen) => set({ isTaskDialogOpen }),
   setTaskType: (taskType) => set({ taskType }),
 }));

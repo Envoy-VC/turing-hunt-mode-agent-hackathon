@@ -1,19 +1,26 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- safe */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- safe */
+import { js as EasyStar } from 'easystarjs';
 import Phaser from 'phaser';
 import Map from 'public/assets/turing-hunt.json';
 import type { GameActions } from '~/hooks';
 
-import { InteractionText, Player } from '../entities';
+import { Agent, InteractionText, Player } from '../entities';
+import { createGridFromTilemap } from '../helpers/pathfinder';
 
 export class WorldScene extends Phaser.Scene {
   public player!: Player;
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  public map!: Phaser.Tilemaps.Tilemap;
   public collisionLayer!: Phaser.Tilemaps.TilemapLayer;
   public interactionLayer!: Phaser.Tilemaps.TilemapLayer;
   public interactionText!: InteractionText;
   public actions: GameActions;
+  public aiAgent!: Agent;
+  public easyStar!: EasyStar;
+
+  public tileSize = 16;
 
   constructor(actions: GameActions) {
     super({ key: 'WorldScene' });
@@ -43,6 +50,8 @@ export class WorldScene extends Phaser.Scene {
       tileHeight: 16,
       tileWidth: 16,
     });
+
+    this.map = map;
 
     const tilesets = Map.tilesets.map((tileset) => {
       return map.addTilesetImage(tileset.name, tileset.name)!;
@@ -81,10 +90,22 @@ export class WorldScene extends Phaser.Scene {
 
     // Set Camera to Follow Player
     this.cameras.main.startFollow(this.player.sprite);
+
+    // Create Pathfinder Graph
+    const easyStar = new EasyStar();
+    const grid = createGridFromTilemap(this.collisionLayer);
+    easyStar.setGrid(grid);
+    easyStar.setAcceptableTiles([0]);
+    easyStar.setIterationsPerCalculation(1000);
+
+    this.easyStar = easyStar;
+    // Add AI Agent
+    this.aiAgent = new Agent(this, { x: 50, y: 200, key: 'ai-agent' });
   }
 
-  update() {
+  update(_time: number, delta: number) {
     this.player.update(this);
     this.interactionText.update(this);
+    this.aiAgent.update(delta);
   }
 }
