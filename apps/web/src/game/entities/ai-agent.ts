@@ -40,13 +40,13 @@ export class Agent {
     this.nextTaskStartTime = Date.now();
 
     this.sprite = scene.physics.add
-      .sprite(props.x, props.y, props.key)
+      .sprite(props.x, props.y, 'player2')
       .setScale(1)
       .setBodySize(24, 24)
       .setOffset(20, 38);
 
     this.sprite.setCollideWorldBounds(true);
-    this.sprite.anims.play({ key: 'idle-south', repeat: -1 }, true);
+    this.sprite.anims.play({ key: 'idle-south-2', repeat: -1 }, true);
 
     // scene.input.on(
     //   'pointerdown',
@@ -140,14 +140,14 @@ export class Agent {
 
         if (this.currentDirection !== newDirection) {
           this.currentDirection = newDirection;
-          this.sprite.anims.play(`walk-${newDirection}`, true);
+          this.sprite.anims.play(`walk-${newDirection}-2`, true);
         } else if (!this.sprite.anims.isPlaying) {
-          this.sprite.anims.play(`walk-${newDirection}`, true);
+          this.sprite.anims.play(`walk-${newDirection}-2`, true);
         }
       }
     } else {
       this.sprite.setVelocity(0);
-      this.sprite.anims.play('idle-south', true);
+      this.sprite.anims.play('idle-south-2', true);
     }
   }
 
@@ -186,7 +186,7 @@ export class Agent {
     ];
     directions.forEach((direction) => {
       scene.anims.create({
-        key: `walk-${direction.key}`,
+        key: `walk-${direction.key}-2`,
         frames: scene.anims.generateFrameNumbers(key, {
           start: direction.rowIndex * framesPerRow,
           end: direction.rowIndex * framesPerRow + 8,
@@ -198,7 +198,7 @@ export class Agent {
 
     directions.forEach((direction) => {
       scene.anims.create({
-        key: `idle-${direction.key}`,
+        key: `idle-${direction.key}-2`,
         frames: scene.anims.generateFrameNumbers(key, {
           start: direction.rowIndex * framesPerRow,
           end: direction.rowIndex * framesPerRow,

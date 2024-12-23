@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { ChatBox } from '~/components';
 import { useGameActions } from '~/hooks/use-game-actions';
 
-import { AIVote } from '~/components/ai-vote';
 import { TaskDialog } from '~/components/tasks';
 import { Button } from '~/components/ui/button';
 import { VoteBox } from '~/components/vote-box';
@@ -60,7 +59,6 @@ const GameBox = ({ game, address }: GameBoxProps) => {
         physics: {
           default: 'arcade',
           arcade: {
-            debug: true,
             gravity: { y: 0, x: 1 },
           },
         },
@@ -86,9 +84,7 @@ const GameBox = ({ game, address }: GameBoxProps) => {
         onOpenChange={actions.store.setIsTaskDialogOpen}
       />
       <div ref={gameContainerRef} id='game-container' />
-      <div className='absolute top-8 left-4'>
-        <AIVote {...game} />
-      </div>
+
       <div className='absolute top-8 right-4 flex flex-row gap-4'>
         <Button
           onClick={() => {

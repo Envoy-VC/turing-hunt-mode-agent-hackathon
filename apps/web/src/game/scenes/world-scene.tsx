@@ -38,6 +38,10 @@ export class WorldScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.spritesheet('player2', 'assets/sprites/player2.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
   }
 
   create() {
@@ -104,7 +108,7 @@ export class WorldScene extends Phaser.Scene {
     // Add AI Agent
     this.aiAgent = new Agent(
       this,
-      { x: 50, y: 200, key: 'ai-agent' },
+      { x: 50, y: 200, key: 'player2' },
       this.actions.chooseRandomTask,
       this.actions.aiCompletedTasks
     );

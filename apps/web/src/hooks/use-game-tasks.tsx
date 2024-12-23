@@ -1,6 +1,4 @@
-import { useMemo } from 'react';
-
-import { chatInGame } from '~/lib/ai';
+import { chatInGame, voteForGame } from '~/lib/ai';
 
 import { useMutation } from 'convex/react';
 import Phaser from 'phaser';
@@ -9,7 +7,7 @@ import { api } from '../../convex/_generated/api';
 import { type Agent } from '../game/entities';
 import { type WorldScene } from '../game/scenes';
 
-import type { ChatMessage, Game } from '~/types/game';
+import type { Game } from '~/types/game';
 
 export interface Task {
   id: string;
@@ -47,7 +45,6 @@ const tasksList = [
 ] as const;
 
 export const useGameTasks = (game: Game) => {
-  const completeTask = useMutation(api.tasks.completeTask);
   const playerAlreadyVoted = game.players.filter(
     (player) => player.hasVoted
   ).length;
@@ -143,28 +140,40 @@ export const useGameTasks = (game: Game) => {
         // do nothing
       },
     },
-    // {
-    //   id: 'vote',
-    //   name: 'Vote Task',
-    //   weight: () => {
-    //     if (hasAiAgentVoted) {
-    //       return 0;
-    //     }
+    {
+      id: 'vote',
+      name: 'Vote Task',
+      weight: () => {
+        if (hasAiAgentVoted) {
+          return 0;
+        }
+        return playerAlreadyVoted ** 2;
+      },
+      waitUntilNextTask: () => {
+        return Phaser.Math.Between(8000, 10000);
+      },
+      repeatable: false,
+      execute: async () => {
+        const m = await getChats({ gameId: game._id });
+        const messages = m.map((m) => {
+          return {
+            address: m.player.address,
+            message: m.content,
+            timestamp: m._creationTime,
+          };
+        });
 
-    //     return playerAlreadyVoted ** 2;
-    //   },
-    //   waitUntilNextTask: () => {
-    //     return Phaser.Math.Between(8000, 10000);
-    //   },
-    //   repeatable: false,
-    //   execute: (agent: Agent, scene: WorldScene) => {},
-    //   checkIfCompleted: () => {
-    //     return true;
-    //   },
-    //   onComplete: () => {
-    //     // do nothing
-    //   },
-    // },
+        // sort by timestamp in ascending order
+        m.sort((a, b) => a._creationTime - b._creationTime);
+        await voteForGame(game._id, game.players.length, messages);
+      },
+      checkIfCompleted: () => {
+        return true;
+      },
+      onComplete: () => {
+        // do nothing
+      },
+    },
     ...tasksList.map((task) => {
       return {
         id: task.id,
