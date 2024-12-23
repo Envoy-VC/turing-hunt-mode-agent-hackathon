@@ -1,18 +1,37 @@
+import { useState } from 'react';
 import { FcGoogle as GoogleIcon } from 'react-icons/fc';
 
-import { useAuth } from '@crossmint/client-sdk-react-ui';
+import {
+  BlockchainTypes,
+  CrossmintEVMWalletAdapter,
+  CrossmintEnvironment,
+} from '@crossmint/connect';
 
 import { Button } from './ui/button';
 
 export const SignIn = () => {
-  const { login, status } = useAuth();
+  const [address, setAddress] = useState<string | undefined>(undefined);
+
+  async function connectToCrossmint() {
+    const _crossmintConnect = new CrossmintEVMWalletAdapter({
+      chain: BlockchainTypes.ETHEREUM,
+      environment: CrossmintEnvironment.STAGING,
+    });
+
+    const address = await _crossmintConnect.connect();
+    console.log(address);
+
+    if (address) {
+      setAddress(address);
+    }
+  }
 
   return (
     <Button
       className='flex h-12 flex-row items-center gap-2 rounded-xl font-medium text-white [&_svg]:size-6'
-      onClick={() => {
+      onClick={async () => {
         try {
-          login();
+          await connectToCrossmint();
         } catch (error) {
           console.error(error);
         }

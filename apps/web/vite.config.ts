@@ -6,13 +6,14 @@ import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-  clearScreen: false,
   envPrefix: ['VITE_'],
   plugins: [
     TanStackRouterVite({}),
     react(),
     tailwindcss(),
-    nodePolyfills({ protocolImports: true }),
+    nodePolyfills({
+      protocolImports: true,
+    }),
   ],
   server: { port: 3000 },
   publicDir: 'public',

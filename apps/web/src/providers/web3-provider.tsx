@@ -1,23 +1,28 @@
+'use client';
+
 import type { PropsWithChildren } from 'react';
 
-import {
-  CrossmintAuthProvider,
-  CrossmintProvider,
-} from '@crossmint/client-sdk-react-ui';
+import { projectId, wagmiConfig } from '~/lib/wagmi';
 
-export const Web3Provider = ({ children }: PropsWithChildren) => {
+import { createWeb3Modal } from '@web3modal/wagmi/react';
+import { type State, WagmiProvider } from 'wagmi';
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  enableAnalytics: true,
+  enableOnramp: true,
+  themeMode: 'dark',
+});
+
+interface Web3ProviderProps extends PropsWithChildren {
+  initialState?: State;
+}
+
+export const Web3Provider = ({ children, initialState }: Web3ProviderProps) => {
   return (
-    <CrossmintProvider apiKey={import.meta.env.VITE_CROSSMINT_API_KEY}>
-      <CrossmintAuthProvider
-        loginMethods={['google']}
-        embeddedWallets={{
-          type: 'evm-smart-wallet',
-          defaultChain: 'base-sepolia',
-          createOnLogin: 'all-users',
-        }}
-      >
-        {children}
-      </CrossmintAuthProvider>
-    </CrossmintProvider>
+    <WagmiProvider config={wagmiConfig} initialState={initialState}>
+      {children}
+    </WagmiProvider>
   );
 };
