@@ -11,10 +11,9 @@ export const sendChatMessage = mutation({
   },
   handler: async (ctx, args) => {
     const game = await getGame(ctx, { gameId: args.gameId });
-    if (!game) {
-      throw new Error('Game not found');
-    }
-    const player = game.players.find((player) => player.id === args.address);
+    const player = game.players.find(
+      (player) => player.address === args.address
+    );
 
     if (!player) {
       throw new Error('Player not found');

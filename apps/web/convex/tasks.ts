@@ -13,10 +13,6 @@ export const completeTask = mutation({
   handler: async (ctx, args) => {
     const game = await getGame(ctx, { gameId: args.gameId });
 
-    if (!game) {
-      throw new Error('Game not found');
-    }
-
     const playerIndex = game.players.findIndex(
       (player) => player.id === args.address
     );

@@ -18,6 +18,7 @@ export const createGame = mutation({
       id: player._id,
       hasVoted: false,
       vote: undefined,
+      address: player.address,
       index,
       tasksCompleted: [],
     }));
@@ -35,6 +36,10 @@ export const getGame = query({
     gameId: v.id('games'),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.gameId);
+    const game = await ctx.db.get(args.gameId);
+    if (!game) {
+      throw new Error('Game not found');
+    }
+    return game;
   },
 });

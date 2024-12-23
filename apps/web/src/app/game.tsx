@@ -1,12 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from 'convex/react';
 import Phaser from 'phaser';
+import { useAccount } from 'wagmi';
 import { z } from 'zod';
+import { ChatBox } from '~/components';
 import { useGameActions } from '~/hooks/use-game-actions';
 
 import { TaskDialog } from '~/components/tasks';
+import { Button } from '~/components/ui/button';
 
+import { api } from '../../convex/_generated/api';
+import { type Id } from '../../convex/_generated/dataModel';
 import { WorldScene } from '../game/scenes';
 
 export const GameComponent = () => {
@@ -14,7 +20,15 @@ export const GameComponent = () => {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const phaserGameRef = useRef<Phaser.Game | null>(null);
 
+  const [showChat, setShowChat] = useState<boolean>(false);
+
+  const game = useQuery(api.game.getGame, {
+    gameId: gameId as Id<'games'>,
+  });
+
   const actions = useGameActions();
+
+  const { address } = useAccount();
 
   useEffect(() => {
     if (gameContainerRef.current) {
@@ -58,6 +72,25 @@ export const GameComponent = () => {
         onOpenChange={actions.store.setIsTaskDialogOpen}
       />
       <div ref={gameContainerRef} id='game-container' />
+      <div className='absolute top-8 right-4'>
+        <Button
+          onClick={() => {
+            setShowChat((p) => !p);
+          }}
+        >
+          Chat
+        </Button>
+      </div>
+      {game && showChat ? (
+        <ChatBox
+          gameId={gameId}
+          isOpen={showChat}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- should be defined
+          me={game.players.find((p) => p.address === address)!}
+          others={game.players.filter((p) => p.address !== address)}
+          setOpen={setShowChat}
+        />
+      ) : null}
     </div>
   );
 };

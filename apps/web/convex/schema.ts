@@ -15,6 +15,7 @@ const abstractPlayer = v.object({
   id: v.id('users'),
   hasVoted: v.boolean(),
   index: v.number(),
+  address: v.string(),
   // Address of the player voted for
   vote: v.optional(v.string()),
   tasksCompleted: v.array(taskType),

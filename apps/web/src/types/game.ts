@@ -1,3 +1,5 @@
+import { type api } from '../../convex/_generated/api';
+
 export type InteractionType =
   | 'fireplace'
   | 'television-set'
@@ -6,3 +8,6 @@ export type InteractionType =
   | 'gym'
   | 'entrance-cupboard'
   | 'swords';
+
+export type Game = typeof api.game.getGame._returnType;
+export type GamePlayer = Game['players'][0];
