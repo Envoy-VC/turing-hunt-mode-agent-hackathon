@@ -3,8 +3,14 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
+import { useMutation } from 'convex/react';
+import { useAccount } from 'wagmi';
+import { Route } from '~/app/game';
+
 import { Button } from '~/components/ui/button';
 
+import { api } from '../../../../convex/_generated/api';
+import { type Id } from '../../../../convex/_generated/dataModel';
 import {
   type GameState,
   type Wire,
@@ -20,6 +26,8 @@ import {
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- safe */
 
 export const TelevisionTask = () => {
+  const { gameId } = Route.useSearch();
+
   const [gameState, setGameState] = useState<GameState>({
     wires: [],
     selectedWire: null,
@@ -72,8 +80,20 @@ export const TelevisionTask = () => {
     }
   };
 
-  const handleCheck = () => {
+  const completeTasks = useMutation(api.tasks.completeTask);
+
+  const { address } = useAccount();
+
+  const handleCheck = async () => {
+    if (!address) return;
     const isSolved = checkSolution(gameState.wires);
+    if (isSolved) {
+      await completeTasks({
+        gameId: gameId as Id<'games'>,
+        task: 'fireplace',
+        address,
+      });
+    }
     setGameState((prevState) => ({ ...prevState, isSolved, isChecked: true }));
   };
 
@@ -168,13 +188,7 @@ export const TelevisionTask = () => {
             disabled={gameState.isSolved}
             onClick={handleCheck}
           >
-            Check
-          </Button>
-          <Button
-            className='rounded-full bg-red-600 px-6 py-2 text-lg font-semibold transition-colors duration-300 hover:bg-red-700'
-            onClick={resetGame}
-          >
-            {gameState.isSolved ? 'Play Again' : 'Reset'}
+            Submit
           </Button>
         </div>
       </div>

@@ -14,7 +14,7 @@ export const completeTask = mutation({
     const game = await getGame(ctx, { gameId: args.gameId });
 
     const playerIndex = game.players.findIndex(
-      (player) => player.id === args.address
+      (player) => player.address === args.address
     );
     const players = [...game.players];
     const player = players[playerIndex];

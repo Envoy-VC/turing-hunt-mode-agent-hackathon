@@ -1,5 +1,13 @@
 import { useCallback, useState } from 'react';
 
+import { useMutation } from 'convex/react';
+import { useAccount } from 'wagmi';
+import { Route } from '~/app/game';
+
+import { api } from '../../../convex/_generated/api';
+import { type Id } from '../../../convex/_generated/dataModel';
+import { Button } from '../ui/button';
+
 function exponentialEase(x: number): number {
   // Normalize x to a range of 0 to 1
   const normalizedX = x / 100;
@@ -30,8 +38,39 @@ export const useFlameIntensity = () => {
 };
 
 export const FireplaceTask = () => {
+  const { gameId } = Route.useSearch();
+
   const { intensity, updateIntensity } = useFlameIntensity();
   const flameStyle = mapIntensityToFlame(intensity);
+
+  const completeTasks = useMutation(api.tasks.completeTask);
+
+  const [message, setMessage] = useState<string | null>(null);
+
+  const { address } = useAccount();
+
+  const onSubmit = async () => {
+    setMessage(null);
+    if (!address) return;
+    if (intensity < 50) {
+      setMessage('Flame intensity too low!');
+      return;
+    }
+
+    if (intensity > 64) {
+      setMessage('Flame intensity too high!');
+      return;
+    }
+
+    await completeTasks({
+      gameId: gameId as Id<'games'>,
+      task: 'fireplace',
+      address,
+    });
+
+    setMessage('Task submitted!');
+  };
+
   return (
     <>
       <div className='mb-8 flex justify-center'>
@@ -65,6 +104,12 @@ export const FireplaceTask = () => {
       <p className='text-center text-sm text-gray-400'>
         Adjust the slider to change the flame&lsquo;s intensity!
       </p>
+      <Button variant='secondary' onClick={onSubmit}>
+        Submit Task
+      </Button>
+      {message ? (
+        <p className='text-center text-neutral-200'>{message}</p>
+      ) : null}
     </>
   );
 };
