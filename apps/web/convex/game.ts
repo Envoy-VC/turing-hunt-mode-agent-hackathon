@@ -7,7 +7,7 @@ export const createGame = mutation({
   args: undefined,
   handler: async (ctx) => {
     const queue = await getQueue(ctx, {});
-    if (queue.length <= 1) {
+    if (queue.length === 0) {
       throw new Error('Not enough players in queue');
     }
 

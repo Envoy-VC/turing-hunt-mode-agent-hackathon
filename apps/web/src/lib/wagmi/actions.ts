@@ -1,4 +1,4 @@
-import { createWalletClient, encodeAbiParameters, http } from 'viem';
+import { createWalletClient, encodeFunctionData, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { modeTestnet } from 'viem/chains';
 
@@ -17,15 +17,19 @@ interface CreateGameProps {
 }
 
 export const createGame = async ({ id, players }: CreateGameProps) => {
-  const data = encodeAbiParameters(gameContractConfig.abi[3].inputs, [
-    id,
-    players,
-  ]);
-  const hash = await client.signTransaction({
+  const data = encodeFunctionData({
+    abi: gameContractConfig.abi,
+    functionName: 'createGame',
+    args: [id, players],
+  });
+  console.log(data);
+  const hash = await client.sendTransaction({
     account,
     to: gameContractConfig.address,
     data,
+    value: BigInt(0),
   });
+  console.log(hash);
 
   return hash;
 };
@@ -36,10 +40,12 @@ interface VoteForPlayerProps {
 }
 
 export const voteForPlayer = async ({ id, player }: VoteForPlayerProps) => {
-  const data = encodeAbiParameters(gameContractConfig.abi[11].inputs, [
-    id,
-    player,
-  ]);
+  const data = encodeFunctionData({
+    abi: gameContractConfig.abi,
+    functionName: 'vote',
+    args: [id, player],
+  });
+
   const hash = await client.signTransaction({
     account,
     to: gameContractConfig.address,

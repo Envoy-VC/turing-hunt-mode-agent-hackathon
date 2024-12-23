@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
+import { wagmiConfig } from '~/lib/wagmi';
 import { createGame } from '~/lib/wagmi/actions';
 
+import { useNavigate } from '@tanstack/react-router';
+import { waitForTransactionReceipt } from '@wagmi/core';
 import { useMutation, useQuery } from 'convex/react';
 import { toast } from 'sonner';
 
@@ -21,18 +24,29 @@ export const QueueDialog = ({ open, setOpen }: QueueDialogProps) => {
   const [time, setTime] = useState<`${string}:${string}`>('00:00');
 
   const startGame = useMutation(api.game.createGame);
+  const navigate = useNavigate();
+
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
 
   const onStartGame = async () => {
     try {
+      setIsCreatingGame(true);
       const { gameId, players } = await startGame();
+      console.log({ gameId, players });
       const hash = await createGame({
         id: gameId,
         players: players.map((p) => p.address as `0x${string}`),
       });
-      console.log(hash);
+      await waitForTransactionReceipt(wagmiConfig, { hash });
+      await navigate({
+        to: '/game',
+        search: { gameId },
+      });
     } catch (error: unknown) {
       const message = (error as Error).message;
       toast.error(message);
+    } finally {
+      setIsCreatingGame(false);
     }
   };
 
@@ -70,8 +84,12 @@ export const QueueDialog = ({ open, setOpen }: QueueDialogProps) => {
 
         <div>Players in Queue: {queueSize?.toString() ?? '0'}</div>
         {(queueSize ?? 0) >= 1 && (
-          <Button variant='secondary' onClick={onStartGame}>
-            Start Game
+          <Button
+            disabled={isCreatingGame}
+            variant='secondary'
+            onClick={onStartGame}
+          >
+            {isCreatingGame ? 'Creating Game...' : 'Start Game'}
           </Button>
         )}
       </DialogContent>

@@ -23,10 +23,10 @@ export const HomeMenu = () => {
   const onOpenChange = async (open: boolean) => {
     if (!address) return;
     if (open) {
-      // await joinQueue({ address });
+      await joinQueue({ address });
       setIsInQueue(true);
     } else {
-      // await leaveQueue({ address });
+      await leaveQueue({ address });
       setIsInQueue(false);
     }
   };
