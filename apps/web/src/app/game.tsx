@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { createFileRoute } from '@tanstack/react-router';
 import Phaser from 'phaser';
+import { z } from 'zod';
 import { useGameActions } from '~/hooks/use-game-actions';
 
 import { TaskDialog } from '~/components/tasks';
@@ -9,6 +10,7 @@ import { TaskDialog } from '~/components/tasks';
 import { WorldScene } from '../game/scenes';
 
 export const GameComponent = () => {
+  const { gameId } = Route.useSearch();
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const phaserGameRef = useRef<Phaser.Game | null>(null);
 
@@ -55,7 +57,6 @@ export const GameComponent = () => {
         open={actions.store.isTaskDialogOpen}
         onOpenChange={actions.store.setIsTaskDialogOpen}
       />
-
       <div ref={gameContainerRef} id='game-container' />
     </div>
   );
@@ -63,4 +64,7 @@ export const GameComponent = () => {
 
 export const Route = createFileRoute('/game')({
   component: GameComponent,
+  validateSearch: z.object({
+    gameId: z.string(),
+  }),
 });

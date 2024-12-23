@@ -11,17 +11,22 @@ export const createGame = mutation({
       throw new Error('Not enough players in queue');
     }
 
-    const players = queue.map((player) => ({
-      id: player.player,
+    // randomize player order
+    queue.sort(() => Math.random() - 0.5);
+
+    const players = queue.map((player, index) => ({
+      id: player._id,
       hasVoted: false,
       vote: undefined,
+      index,
       tasksCompleted: [],
     }));
+
     const gameId = await ctx.db.insert('games', {
       players,
     });
 
-    return gameId;
+    return { gameId, players: queue };
   },
 });
 

@@ -14,6 +14,7 @@ export const taskType = v.union(
 const abstractPlayer = v.object({
   id: v.id('users'),
   hasVoted: v.boolean(),
+  index: v.number(),
   // Address of the player voted for
   vote: v.optional(v.string()),
   tasksCompleted: v.array(taskType),

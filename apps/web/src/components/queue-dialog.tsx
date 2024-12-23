@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { createGame } from '~/lib/wagmi/actions';
+
 import { useMutation, useQuery } from 'convex/react';
 import { toast } from 'sonner';
 
@@ -22,7 +24,12 @@ export const QueueDialog = ({ open, setOpen }: QueueDialogProps) => {
 
   const onStartGame = async () => {
     try {
-      const gameId = await startGame();
+      const { gameId, players } = await startGame();
+      const hash = await createGame({
+        id: gameId,
+        players: players.map((p) => p.address as `0x${string}`),
+      });
+      console.log(hash);
     } catch (error: unknown) {
       const message = (error as Error).message;
       toast.error(message);

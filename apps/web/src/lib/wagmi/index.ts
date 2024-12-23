@@ -8,6 +8,8 @@ import {
 import { modeTestnet } from 'wagmi/chains';
 import { walletConnect } from 'wagmi/connectors';
 
+import { TURING_HUNT_ABI } from './abi';
+
 export const projectId = import.meta.env.VITE_REOWN_PROJECT_ID;
 
 const metadata = {
@@ -28,3 +30,8 @@ export const wagmiConfig: Config = createConfig({
     [modeTestnet.id]: http(),
   },
 });
+
+export const gameContractConfig = {
+  address: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+  abi: TURING_HUNT_ABI,
+};
