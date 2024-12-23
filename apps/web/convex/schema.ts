@@ -30,13 +30,15 @@ const schema = defineSchema({
   queue: defineTable({
     player: v.id('users'),
   }),
-  conversations: defineTable({
-    gameId: v.id('games'),
-  }).index('id', ['gameId']),
   messages: defineTable({
-    conversationId: v.id('conversations'),
+    gameId: v.id('games'),
+    player: v.object({
+      id: v.id('users'),
+      address: v.string(),
+      index: v.number(),
+    }),
     content: v.string(),
-  }).index('conversationId', ['conversationId']),
+  }).index('gameId', ['gameId', 'player.id']),
 });
 
 // eslint-disable-next-line import/no-default-export -- safe

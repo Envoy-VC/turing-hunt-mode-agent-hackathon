@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from 'convex/server';
 
+import type * as chat from '../chat.js';
 import type * as game from '../game.js';
 import type * as player from '../player.js';
 import type * as queue from '../queue.js';
@@ -29,6 +30,7 @@ import type * as vote from '../vote.js';
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  chat: typeof chat;
   game: typeof game;
   player: typeof player;
   queue: typeof queue;
