@@ -25,6 +25,7 @@ export class Player {
   }
 
   update(scene: WorldScene) {
+    if (!scene.cursors) return;
     const { left, right, up, down } = scene.cursors;
 
     // Reset velocity

@@ -93,56 +93,56 @@ export const useGameTasks = (game: Game) => {
         // do nothing
       },
     },
-    // {
-    //   id: 'chat',
-    //   name: 'Chat Task',
-    //   weight: () => 2,
-    //   waitUntilNextTask: () => {
-    //     return Phaser.Math.Between(8000, 10000);
-    //   },
-    //   repeatable: true,
-    //   execute: async (agent) => {
-    //     const m = await getChats({ gameId: game._id });
-    //     const messages = m.map((m) => {
-    //       return {
-    //         address: m.player.address,
-    //         message: m.content,
-    //         timestamp: m._creationTime,
-    //       };
-    //     });
+    {
+      id: 'chat',
+      name: 'Chat Task',
+      weight: () => 2,
+      waitUntilNextTask: () => {
+        return Phaser.Math.Between(8000, 10000);
+      },
+      repeatable: true,
+      execute: async (agent) => {
+        const m = await getChats({ gameId: game._id });
+        const messages = m.map((m) => {
+          return {
+            address: m.player.address,
+            message: m.content,
+            timestamp: m._creationTime,
+          };
+        });
 
-    //     // sort by timestamp in ascending order
-    //     m.sort((a, b) => a._creationTime - b._creationTime);
-    //     console.log(messages);
-    //     if (messages.length === 0) {
-    //       return;
-    //     }
+        // sort by timestamp in ascending order
+        m.sort((a, b) => a._creationTime - b._creationTime);
+        console.log(messages);
+        if (messages.length === 0) {
+          return;
+        }
 
-    //     if (
-    //       messages[messages.length - 1]?.address ===
-    //       import.meta.env.VITE_PUBLIC_ADMIN_ADDRESS
-    //     ) {
-    //       return;
-    //     }
+        if (
+          messages[messages.length - 1]?.address ===
+          import.meta.env.VITE_PUBLIC_ADMIN_ADDRESS
+        ) {
+          return;
+        }
 
-    //     const message = await chatInGame(
-    //       messages,
-    //       Array.from(agent.completedTasks)
-    //     );
-    //     if (message === '') return;
-    //     await sendMessage({
-    //       address: import.meta.env.VITE_PUBLIC_ADMIN_ADDRESS,
-    //       content: message,
-    //       gameId: game._id,
-    //     });
-    //   },
-    //   checkIfCompleted: () => {
-    //     return true;
-    //   },
-    //   onComplete: () => {
-    //     // do nothing
-    //   },
-    // },
+        const message = await chatInGame(
+          messages,
+          Array.from(agent.completedTasks)
+        );
+        if (message === '') return;
+        await sendMessage({
+          address: import.meta.env.VITE_PUBLIC_ADMIN_ADDRESS,
+          content: message,
+          gameId: game._id,
+        });
+      },
+      checkIfCompleted: () => {
+        return true;
+      },
+      onComplete: () => {
+        // do nothing
+      },
+    },
     // {
     //   id: 'vote',
     //   name: 'Vote Task',

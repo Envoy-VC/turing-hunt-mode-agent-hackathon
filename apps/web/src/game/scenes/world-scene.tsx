@@ -11,7 +11,7 @@ import { createGridFromTilemap } from '../helpers/pathfinder';
 
 export class WorldScene extends Phaser.Scene {
   public player!: Player;
-  public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  public cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
   public map!: Phaser.Tilemaps.Tilemap;
   public collisionLayer!: Phaser.Tilemaps.TilemapLayer;
   public interactionLayer!: Phaser.Tilemaps.TilemapLayer;
@@ -25,6 +25,7 @@ export class WorldScene extends Phaser.Scene {
   constructor(actions: GameActions) {
     super({ key: 'WorldScene' });
     this.actions = actions;
+    this.cursors = null;
   }
 
   preload() {
@@ -85,7 +86,7 @@ export class WorldScene extends Phaser.Scene {
     this.physics.add.collider(this.player.sprite, this.interactionLayer);
     this.interactionText = new InteractionText(this);
 
-    // Create Cursor Keys
+    // Create Cursor Keys only up down left right, no spacebar
     this.cursors = this.input.keyboard!.createCursorKeys();
 
     // Set Camera to Follow Player
@@ -114,9 +115,9 @@ export class WorldScene extends Phaser.Scene {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises -- safe
   async update(_time: number, delta: number) {
     if (this.actions.store.isChatOpen) {
-      this.input.keyboard?.disableGlobalCapture();
+      this.cursors = null;
     } else {
-      this.input.keyboard?.enableGlobalCapture();
+      this.cursors = this.input.keyboard!.createCursorKeys();
     }
     this.player.update(this);
     this.interactionText.update(this);
