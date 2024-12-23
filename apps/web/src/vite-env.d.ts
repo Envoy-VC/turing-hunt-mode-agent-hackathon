@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_CONVEX_URL: string;
   readonly VITE_PUBLIC_ADMIN_ADDRESS: string;
   readonly VITE_PUBLIC_ADMIN_PK: `0x${string}`;
+  readonly VITE_XAI_KEY: string;
 }
 
 interface ImportMeta {

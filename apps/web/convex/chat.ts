@@ -45,3 +45,18 @@ export const getChatMessages = query({
     return messages;
   },
 });
+
+export const getChatMessagesMutation = mutation({
+  args: {
+    gameId: v.id('games'),
+  },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query('messages')
+      .filter((q) => q.eq(q.field('gameId'), args.gameId))
+      .order('asc')
+      .collect();
+
+    return messages;
+  },
+});

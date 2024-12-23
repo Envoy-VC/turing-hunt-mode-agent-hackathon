@@ -68,7 +68,7 @@ export class WorldScene extends Phaser.Scene {
         this.interactionLayer = map
           .createLayer(layer.name, tilesets, 0, 0)!
           .setScale(zoom)
-          .setAlpha(0.25);
+          .setAlpha(0);
         return;
       }
       map.createLayer(layer.name, tilesets, 0, 0)!.setScale(zoom);
@@ -97,16 +97,26 @@ export class WorldScene extends Phaser.Scene {
     easyStar.setGrid(grid);
     easyStar.setAcceptableTiles([0]);
     easyStar.setIterationsPerCalculation(1000);
+    easyStar.disableCornerCutting();
 
     this.easyStar = easyStar;
     // Add AI Agent
-    this.aiAgent = new Agent(this, { x: 50, y: 200, key: 'ai-agent' });
+    this.aiAgent = new Agent(
+      this,
+      { x: 50, y: 200, key: 'ai-agent' },
+      this.actions.chooseRandomTask,
+      this.actions.aiCompletedTasks
+    );
 
-    this.cameras.main.startFollow(this.aiAgent.sprite);
+    this.cameras.main.startFollow(this.player.sprite);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises -- safe
   async update(_time: number, delta: number) {
+    this.input.keyboard?.enableGlobalCapture();
+    if (this.actions.store.isChatOpen) {
+      this.input.keyboard?.disableGlobalCapture();
+    }
     this.player.update(this);
     this.interactionText.update(this);
     await this.aiAgent.update(delta, this);

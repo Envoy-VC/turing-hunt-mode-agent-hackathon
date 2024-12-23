@@ -11,3 +11,4 @@ export type InteractionType =
 
 export type Game = typeof api.game.getGame._returnType;
 export type GamePlayer = Game['players'][0];
+export type ChatMessage = (typeof api.chat.getChatMessages._returnType)[0];

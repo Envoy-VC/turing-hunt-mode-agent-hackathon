@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
+import type { Task } from '../../hooks/use-game-tasks';
 import type { WorldScene } from '../scenes';
-import { Task, chooseRandomTask } from '../tasks/index';
 
 interface AgentCreateProps {
   x: number;
@@ -18,16 +18,23 @@ export class Agent {
   private currentTask: Task | null;
   private lastTaskCompletedAt: number;
   private nextTaskStartTime: number;
-  private completedTasks: Set<string>;
+  public completedTasks: Set<string>;
   private isTaskRunning: boolean;
+  private chooseRandomTask: (completedIds: Set<string>) => Task;
 
-  constructor(scene: WorldScene, props: AgentCreateProps) {
+  constructor(
+    scene: WorldScene,
+    props: AgentCreateProps,
+    chooseRandomTask: (completedIds: Set<string>) => Task,
+    completedTasks: string[]
+  ) {
     this.createAnims(scene, props.key);
     this.speed = 50;
     this.currentDirection = 'south';
+    this.chooseRandomTask = chooseRandomTask;
     this.currentTask = null;
 
-    this.completedTasks = new Set();
+    this.completedTasks = new Set(...completedTasks);
     this.isTaskRunning = false;
     this.lastTaskCompletedAt = Date.now();
     this.nextTaskStartTime = Date.now();
@@ -41,19 +48,20 @@ export class Agent {
     this.sprite.setCollideWorldBounds(true);
     this.sprite.anims.play({ key: 'idle-south', repeat: -1 }, true);
 
-    scene.input.on(
-      'pointerdown',
-      (pointer: Phaser.Input.Pointer) => {
-        this.handlePointerDown(pointer, scene);
-      },
-      this
-    );
+    // scene.input.on(
+    //   'pointerdown',
+    //   (pointer: Phaser.Input.Pointer) => {
+    //     this.handlePointerDown(pointer, scene);
+    //   },
+    //   this
+    // );
   }
 
   private handlePointerDown(pointer: Phaser.Input.Pointer, scene: WorldScene) {
     const zoom = scene.cameras.main.zoom;
     const tileX = Math.floor(pointer.worldX / (scene.tileSize * zoom));
     const tileY = Math.floor(pointer.worldY / (scene.tileSize * zoom));
+    console.log(tileX, tileY);
     this.moveTo(tileX, tileY, scene);
   }
 
@@ -86,17 +94,20 @@ export class Agent {
   async update(delta: number, scene: WorldScene) {
     // Handle No Current Task
     if (!this.currentTask) {
-      const randomTask = chooseRandomTask(this.completedTasks);
+      const randomTask = this.chooseRandomTask(this.completedTasks);
+      console.log(randomTask);
       this.currentTask = randomTask;
       this.isTaskRunning = true;
       await randomTask.execute(this, scene);
     } else if (this.isTaskRunning) {
       const completed = this.currentTask.checkIfCompleted(this, scene);
       if (completed) {
+        await this.currentTask.onComplete(this, scene);
         this.isTaskRunning = false;
         this.lastTaskCompletedAt = Date.now();
-        this.nextTaskStartTime =
-          Date.now() + this.currentTask.waitUntilNextTask;
+        const waitTime = this.currentTask.waitUntilNextTask();
+        console.log('Waiting for ', waitTime, ' ms');
+        this.nextTaskStartTime = Date.now() + waitTime;
         if (!this.currentTask.repeatable) {
           this.completedTasks.add(this.currentTask.id);
         }

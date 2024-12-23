@@ -4,7 +4,7 @@ import { modeTestnet } from 'viem/chains';
 
 import { gameContractConfig } from '.';
 
-const client = createWalletClient({
+export const agentWalletClient = createWalletClient({
   chain: modeTestnet,
   transport: http(),
 });
@@ -22,14 +22,13 @@ export const createGame = async ({ id, players }: CreateGameProps) => {
     functionName: 'createGame',
     args: [id, players],
   });
-  console.log(data);
-  const hash = await client.sendTransaction({
+
+  const hash = await agentWalletClient.sendTransaction({
     account,
     to: gameContractConfig.address,
     data,
     value: BigInt(0),
   });
-  console.log(hash);
 
   return hash;
 };
@@ -46,10 +45,11 @@ export const voteForPlayer = async ({ id, player }: VoteForPlayerProps) => {
     args: [id, player],
   });
 
-  const hash = await client.signTransaction({
+  const hash = await agentWalletClient.sendTransaction({
     account,
     to: gameContractConfig.address,
     data,
+    value: BigInt(0),
   });
 
   return hash;

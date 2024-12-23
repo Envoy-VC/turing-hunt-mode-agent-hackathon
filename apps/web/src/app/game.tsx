@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
@@ -15,20 +15,32 @@ import { api } from '../../convex/_generated/api';
 import { type Id } from '../../convex/_generated/dataModel';
 import { WorldScene } from '../game/scenes';
 
+import { type Game } from '~/types/game';
+
 export const GameComponent = () => {
   const { gameId } = Route.useSearch();
-  const gameContainerRef = useRef<HTMLDivElement>(null);
-  const phaserGameRef = useRef<Phaser.Game | null>(null);
-
-  const [showChat, setShowChat] = useState<boolean>(false);
 
   const game = useQuery(api.game.getGame, {
     gameId: gameId as Id<'games'>,
   });
 
-  const actions = useGameActions();
-
   const { address } = useAccount();
+
+  if (!game || !address) return null;
+
+  return <GameBox address={address} game={game} />;
+};
+
+interface GameBoxProps {
+  game: Game;
+  address: string;
+}
+
+const GameBox = ({ game, address }: GameBoxProps) => {
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const phaserGameRef = useRef<Phaser.Game | null>(null);
+
+  const actions = useGameActions(game);
 
   useEffect(() => {
     if (gameContainerRef.current) {
@@ -75,22 +87,21 @@ export const GameComponent = () => {
       <div className='absolute top-8 right-4'>
         <Button
           onClick={() => {
-            setShowChat((p) => !p);
+            actions.store.setIsChatOpen(!actions.store.isChatOpen);
           }}
         >
           Chat
         </Button>
       </div>
-      {game && showChat ? (
-        <ChatBox
-          gameId={gameId}
-          isOpen={showChat}
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- should be defined
-          me={game.players.find((p) => p.address === address)!}
-          others={game.players.filter((p) => p.address !== address)}
-          setOpen={setShowChat}
-        />
-      ) : null}
+
+      <ChatBox
+        gameId={game._id}
+        isOpen={actions.store.isChatOpen}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- should be defined
+        me={game.players.find((p) => p.address === address)!}
+        others={game.players.filter((p) => p.address !== address)}
+        setOpen={actions.store.setIsChatOpen}
+      />
     </div>
   );
 };
