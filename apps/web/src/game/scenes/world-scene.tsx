@@ -89,7 +89,7 @@ export class WorldScene extends Phaser.Scene {
     this.cursors = this.input.keyboard!.createCursorKeys();
 
     // Set Camera to Follow Player
-    this.cameras.main.startFollow(this.player.sprite);
+    // this.cameras.main.startFollow(this.player.sprite);
 
     // Create Pathfinder Graph
     const easyStar = new EasyStar();
@@ -101,11 +101,14 @@ export class WorldScene extends Phaser.Scene {
     this.easyStar = easyStar;
     // Add AI Agent
     this.aiAgent = new Agent(this, { x: 50, y: 200, key: 'ai-agent' });
+
+    this.cameras.main.startFollow(this.aiAgent.sprite);
   }
 
-  update(_time: number, delta: number) {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises -- safe
+  async update(_time: number, delta: number) {
     this.player.update(this);
     this.interactionText.update(this);
-    this.aiAgent.update(delta);
+    await this.aiAgent.update(delta, this);
   }
 }

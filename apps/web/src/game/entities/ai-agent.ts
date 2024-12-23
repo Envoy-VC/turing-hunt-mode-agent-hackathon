@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import type { WorldScene } from '../scenes';
+import { Task, chooseRandomTask } from '../tasks/index';
 
 interface AgentCreateProps {
   x: number;
@@ -14,10 +15,22 @@ export class Agent {
   public targetPath: { x: number; y: number }[] = [];
   public currentDirection: string;
 
+  private currentTask: Task | null;
+  private lastTaskCompletedAt: number;
+  private nextTaskStartTime: number;
+  private completedTasks: Set<string>;
+  private isTaskRunning: boolean;
+
   constructor(scene: WorldScene, props: AgentCreateProps) {
     this.createAnims(scene, props.key);
     this.speed = 50;
     this.currentDirection = 'south';
+    this.currentTask = null;
+
+    this.completedTasks = new Set();
+    this.isTaskRunning = false;
+    this.lastTaskCompletedAt = Date.now();
+    this.nextTaskStartTime = Date.now();
 
     this.sprite = scene.physics.add
       .sprite(props.x, props.y, props.key)
@@ -37,10 +50,15 @@ export class Agent {
     );
   }
 
-  handlePointerDown(pointer: Phaser.Input.Pointer, scene: WorldScene) {
+  private handlePointerDown(pointer: Phaser.Input.Pointer, scene: WorldScene) {
     const zoom = scene.cameras.main.zoom;
     const tileX = Math.floor(pointer.worldX / (scene.tileSize * zoom));
     const tileY = Math.floor(pointer.worldY / (scene.tileSize * zoom));
+    this.moveTo(tileX, tileY, scene);
+  }
+
+  public moveTo(tileX: number, tileY: number, scene: WorldScene) {
+    const zoom = scene.cameras.main.zoom;
 
     const playerTileX = Math.floor(this.sprite.x / (scene.tileSize * zoom));
     const playerTileY = Math.floor(this.sprite.y / (scene.tileSize * zoom));
@@ -65,7 +83,28 @@ export class Agent {
     scene.easyStar.calculate();
   }
 
-  update(delta: number) {
+  async update(delta: number, scene: WorldScene) {
+    // Handle No Current Task
+    if (!this.currentTask) {
+      const randomTask = chooseRandomTask(this.completedTasks);
+      this.currentTask = randomTask;
+      this.isTaskRunning = true;
+      await randomTask.execute(this, scene);
+    } else if (this.isTaskRunning) {
+      const completed = this.currentTask.checkIfCompleted(this, scene);
+      if (completed) {
+        this.isTaskRunning = false;
+        this.lastTaskCompletedAt = Date.now();
+        this.nextTaskStartTime =
+          Date.now() + this.currentTask.waitUntilNextTask;
+        if (!this.currentTask.repeatable) {
+          this.completedTasks.add(this.currentTask.id);
+        }
+      }
+    } else if (this.nextTaskStartTime <= Date.now()) {
+      this.currentTask = null;
+    }
+
     if (this.targetPath.length > 0) {
       const target = this.targetPath[0];
       if (!target) return;
@@ -101,7 +140,7 @@ export class Agent {
     }
   }
 
-  getDirectionFromAngle(angle: number): string {
+  private getDirectionFromAngle(angle: number): string {
     const deg = Phaser.Math.RadToDeg(angle);
 
     if (deg >= -45 && deg <= 45) {
