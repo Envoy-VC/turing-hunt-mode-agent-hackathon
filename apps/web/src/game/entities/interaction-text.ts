@@ -7,14 +7,11 @@ import type { InteractionType } from '~/types/game';
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- safe  */
 export class InteractionText {
-  private interactionKey!: Phaser.Input.Keyboard.Key;
   private interactionText!: Phaser.GameObjects.Text;
   private blinkingTimer!: Phaser.Time.TimerEvent | null;
 
   constructor(scene: WorldScene) {
-    this.interactionKey = scene.input.keyboard!.addKey('E');
     this.blinkingTimer = null;
-
     this.interactionText = scene.add.text(0, 0, 'Press E to interact', {
       fontSize: '16px',
       color: '#ffffff',
@@ -62,11 +59,10 @@ export class InteractionText {
       this.startBlinkingText(scene);
     }
 
-    if (Phaser.Input.Keyboard.JustDown(this.interactionKey)) {
-      // TODO: Implement interaction logic
+    scene.input.keyboard!.on('keydown-E', () => {
       console.log(`Interacted with Task ${interactionType}`, tile);
       scene.actions.startTask(interactionType);
-    }
+    });
   }
 
   startBlinkingText(scene: WorldScene) {
@@ -90,6 +86,7 @@ export class InteractionText {
 
   update(scene: WorldScene) {
     const tile = this.checkInteractionTile(scene);
+
     if (tile) {
       this.handleInteraction(tile, scene);
     } else {

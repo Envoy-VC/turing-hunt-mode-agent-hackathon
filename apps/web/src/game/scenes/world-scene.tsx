@@ -113,9 +113,10 @@ export class WorldScene extends Phaser.Scene {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises -- safe
   async update(_time: number, delta: number) {
-    this.input.keyboard?.enableGlobalCapture();
     if (this.actions.store.isChatOpen) {
       this.input.keyboard?.disableGlobalCapture();
+    } else {
+      this.input.keyboard?.enableGlobalCapture();
     }
     this.player.update(this);
     this.interactionText.update(this);

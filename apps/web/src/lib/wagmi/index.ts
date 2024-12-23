@@ -32,6 +32,6 @@ export const wagmiConfig: Config = createConfig({
 });
 
 export const gameContractConfig = {
-  address: '0xc96DE6A3C2d186aE35899297F009329f48c1ab3D' as `0x${string}`,
+  address: '0x7F057B162503D0689F629dfbAc1546D76ddc0004' as `0x${string}`,
   abi: TURING_HUNT_ABI,
 };

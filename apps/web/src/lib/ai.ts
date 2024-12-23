@@ -52,6 +52,7 @@ export const voteForGame = async (
   });
 
   console.log(result);
+  return result;
 };
 
 export const chatInGame = async (

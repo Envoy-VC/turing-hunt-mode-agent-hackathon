@@ -110,7 +110,6 @@ contract TuringHunt is Ownable {
     /// @dev Reverts if the game does not exist, the player has already voted, or not all players have voted
     function vote(string memory _gameId, address _votee) public {
         ensureGameExists(_gameId);
-        ensurePlayerHasNotVoted(_gameId, msg.sender);
 
         uint8 playerIndex = getPlayerIndex(_gameId, msg.sender);
         uint8 voteeIndex = getPlayerIndex(_gameId, _votee);

@@ -4,12 +4,13 @@ import { modeTestnet } from 'viem/chains';
 
 import { gameContractConfig } from '.';
 
+const account = privateKeyToAccount(import.meta.env.VITE_PUBLIC_ADMIN_PK);
+
 export const agentWalletClient = createWalletClient({
   chain: modeTestnet,
   transport: http(),
+  account,
 });
-
-const account = privateKeyToAccount(import.meta.env.VITE_PUBLIC_ADMIN_PK);
 
 interface CreateGameProps {
   id: string;
