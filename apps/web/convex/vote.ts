@@ -13,7 +13,7 @@ export const vote = mutation({
     const game = await getGame(ctx, { gameId: args.gameId });
 
     const playerIndex = game.players.findIndex(
-      (player) => player.id === args.address
+      (player) => player.address === args.address
     );
     const players = [...game.players];
     const player = players[playerIndex];
@@ -23,7 +23,7 @@ export const vote = mutation({
     }
 
     const voteeExists = game.players.some(
-      (player) => player.id === args.voteeAddress
+      (player) => player.address === args.voteeAddress
     );
 
     if (!voteeExists) {

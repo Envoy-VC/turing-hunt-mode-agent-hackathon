@@ -10,6 +10,7 @@ import { useGameActions } from '~/hooks/use-game-actions';
 
 import { TaskDialog } from '~/components/tasks';
 import { Button } from '~/components/ui/button';
+import { VoteBox } from '~/components/vote-box';
 
 import { api } from '../../convex/_generated/api';
 import { type Id } from '../../convex/_generated/dataModel';
@@ -84,7 +85,14 @@ const GameBox = ({ game, address }: GameBoxProps) => {
         onOpenChange={actions.store.setIsTaskDialogOpen}
       />
       <div ref={gameContainerRef} id='game-container' />
-      <div className='absolute top-8 right-4'>
+      <div className='absolute top-8 right-4 flex flex-row gap-4'>
+        <Button
+          onClick={() => {
+            actions.store.setIsVoteBoxOpen(!actions.store.isVoteBoxOpen);
+          }}
+        >
+          Vote
+        </Button>
         <Button
           onClick={() => {
             actions.store.setIsChatOpen(!actions.store.isChatOpen);
@@ -93,7 +101,6 @@ const GameBox = ({ game, address }: GameBoxProps) => {
           Chat
         </Button>
       </div>
-
       <ChatBox
         gameId={game._id}
         isOpen={actions.store.isChatOpen}
@@ -101,6 +108,12 @@ const GameBox = ({ game, address }: GameBoxProps) => {
         me={game.players.find((p) => p.address === address)!}
         others={game.players.filter((p) => p.address !== address)}
         setOpen={actions.store.setIsChatOpen}
+      />
+      <VoteBox
+        gameId={game._id}
+        isOpen={actions.store.isVoteBoxOpen}
+        others={game.players.filter((p) => p.address !== address)}
+        setOpen={actions.store.setIsVoteBoxOpen}
       />
     </div>
   );

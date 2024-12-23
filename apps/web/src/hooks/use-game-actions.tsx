@@ -7,18 +7,22 @@ import type { Game, InteractionType } from '~/types/game';
 interface GameStore {
   isTaskDialogOpen: boolean;
   isChatOpen: boolean;
+  isVoteBoxOpen: boolean;
   taskType: InteractionType | null;
   setIsTaskDialogOpen: (isTaskDialogOpen: boolean) => void;
   setIsChatOpen: (isChatOpen: boolean) => void;
+  setIsVoteBoxOpen: (isVoteBoxOpen: boolean) => void;
   setTaskType: (taskType: InteractionType | null) => void;
 }
 
 const useGameStore = create<GameStore>((set) => ({
   isTaskDialogOpen: false,
   isChatOpen: false,
+  isVoteBoxOpen: false,
   taskType: null,
   setIsTaskDialogOpen: (isTaskDialogOpen) => set({ isTaskDialogOpen }),
   setIsChatOpen: (isChatOpen) => set({ isChatOpen }),
+  setIsVoteBoxOpen: (isVoteBoxOpen) => set({ isVoteBoxOpen }),
   setTaskType: (taskType) => set({ taskType }),
 }));
 
